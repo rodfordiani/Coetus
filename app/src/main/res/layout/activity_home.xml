@@ -6,4 +6,50 @@
     android:layout_height="match_parent"
     tools:context="coetus.projetointegradod.puccampinas.coetus.Home">
 
+    <Button
+        android:id="@+id/gruposHome"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:onClick="verGrupos"
+        android:text="Grupos"
+        app:layout_constraintBottom_toTopOf="@+id/criarGrupoHome"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tituloHome" />
+
+    <Button
+        android:id="@+id/criarGrupoHome"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="criarGrupo"
+        android:text="Criar grupo"
+        app:layout_constraintBottom_toTopOf="@+id/participarGrupoHome"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/gruposHome" />
+
+    <Button
+        android:id="@+id/participarGrupoHome"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="participarGrupo"
+        android:text="Participar de grupo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/criarGrupoHome" />
+
+    <TextView
+        android:id="@+id/tituloHome"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:text="TextView"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/gruposHome"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>

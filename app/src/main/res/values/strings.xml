@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Coetus</string>
+    <string name="title_activity_grupos">Grupos</string>
+    <string name="listaGrupos">TextView</string>
 </resources>

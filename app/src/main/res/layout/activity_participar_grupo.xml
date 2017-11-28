@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="coetus.projetointegradod.puccampinas.coetus.ParticiparGrupo">
+
+    <EditText
+        android:id="@+id/chave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Chave"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/participarGrupoChave"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/participarGrupoChave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Participar"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarParticiparGrupo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chave" />
+
+    <ProgressBar
+        android:id="@+id/progressBarParticiparGrupo"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/participarGrupoChave" />
+</android.support.constraint.ConstraintLayout>
