@@ -1,24 +1,24 @@
 package coetus.projetointegradod.puccampinas.coetus;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -30,10 +30,13 @@ public class Grupos extends AppCompatActivity {
     ListView lista;
     int id;
     SharedPreferences configuracoes;
+    Editor editor;
     Connection conexao;
     ProgressBar progressBar;
     ArrayList nomes;
-    ListAdapter adaptador;
+    ArrayList<Integer> ids;
+    ArrayAdapter adaptador;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,7 @@ public class Grupos extends AppCompatActivity {
         lista = findViewById(R.id.listaGrupos);
         progressBar = findViewById(R.id.progressBarGrupos);
         nomes = new ArrayList();
+        ids = new ArrayList<Integer>();
         adaptador = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, nomes);
         lista.setAdapter(adaptador);
         lista.setBackgroundColor(Color.DKGRAY);
@@ -49,11 +53,21 @@ public class Grupos extends AppCompatActivity {
         lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                          @Override
                                          public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                                             String textoPosicao = String.valueOf(parent.getItemAtPosition(position));
+                                             editor.putInt("idGrupo", ids.get(position));
+                                             String textoPosicao = Integer.toString(ids.get(position));
                                              Toast.makeText(Grupos.this, textoPosicao, Toast.LENGTH_SHORT).show();
+                                             //intent = new Intent(Grupos.this, ParticiparGrupo.class);
+                                             //startActivity(intent);
                                          }
                                      });
         buscarGrupos();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();  // Always call the superclass method first
+        buscarGrupos();
+        adaptador.notifyDataSetChanged();
     }
 
     protected void buscarGrupos(){
@@ -61,6 +75,7 @@ public class Grupos extends AppCompatActivity {
         id = configuracoes.getInt("id", 0);
         BuscaGrupos buscagrupos = new BuscaGrupos();
         buscagrupos.execute(Integer.toString(id));
+        editor = configuracoes.edit();
     }
 
     public class BuscaGrupos extends AsyncTask<String, String, String> {
@@ -99,9 +114,7 @@ public class Grupos extends AppCompatActivity {
                         Statement stmt = conexao.createStatement();
                         ResultSet rs = stmt.executeQuery(query);
                         while (rs.next()) {
-                            /*Grupo grupo = new Grupo();
-                            grupo.setId(rs.getInt("ID"));
-                            grupo.setNome(rs.getString("NOME"));*/
+                            ids.add(rs.getInt("ID"));
                             nomes.add(rs.getString("NOME"));
                             mensagem += rs.getString("NOME");
                         }
@@ -111,7 +124,7 @@ public class Grupos extends AppCompatActivity {
                 }
                 catch (Exception e) {
                     isSuccess = false;
-                    mensagem = "Erro ao recuperar grupos!";
+                    mensagem = "Erro ao recuperar grupos!" + e.getMessage();
                     e.printStackTrace();
                 }
             }
