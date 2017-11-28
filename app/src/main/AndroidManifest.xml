@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="coetus.projetointegradod.puccampinas.coetus">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -17,8 +19,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".Cadastro" />
-        <activity android:name=".Home"></activity>
+        <activity android:name=".Home" />
+        <activity android:name=".CriarGrupo" />
+        <activity android:name=".Grupos" />
+        <activity android:name=".ParticiparGrupo"></activity>
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
