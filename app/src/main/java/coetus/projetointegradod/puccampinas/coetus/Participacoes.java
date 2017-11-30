@@ -24,49 +24,43 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class Eventos extends AppCompatActivity {
+public class Participacoes extends AppCompatActivity {
     ListView lista;
-    int idGrupo;
+    int idEvento;
     SharedPreferences configuracoes;
     SharedPreferences.Editor editor;
     Connection conexao;
-    ArrayList nomes, ids;
+    ArrayList funcoes;
+    ArrayList usuarios;
+    ArrayList participacoes;
     ListAdapter adaptador;
     Intent intent;
+    String participacao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_eventos);
-        lista = findViewById(R.id.listaEventos);
-        nomes = new ArrayList();
-        ids = new ArrayList();
-        adaptador = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, nomes);
+        setContentView(R.layout.activity_participacoes);
+        lista = findViewById(R.id.listaParticipacoes);
+        funcoes = new ArrayList();
+        usuarios = new ArrayList();
+        participacoes = new ArrayList<>();
+        adaptador = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, participacoes);
         lista.setAdapter(adaptador);
         lista.setBackgroundColor(Color.DKGRAY);
         configuracoes = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         editor = configuracoes.edit();
 
-        lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                editor.putInt("idEvento", (int)ids.get(position));
-                editor.putString("nomeEvento", (String)nomes.get(position));
-                editor.apply();
-                intent = new Intent(getApplicationContext(), Participacoes.class);
-                startActivity(intent);
-            }
-        });
-        buscarEventos();
+        buscarParticipacoes();
     }
 
-    protected void buscarEventos(){
-        idGrupo = configuracoes.getInt("idGrupo", 0);
-        BuscaEventos buscaeventos = new BuscaEventos();
-        buscaeventos.execute(Integer.toString(idGrupo));
+    protected void buscarParticipacoes(){
+        idEvento = configuracoes.getInt("idEvento", 0);
+        BuscaParticipacoes buscaparticipacoes = new BuscaParticipacoes();
+        buscaparticipacoes.execute(Integer.toString(idEvento));
     }
 
-    public class BuscaEventos extends AsyncTask<String, String, String> {
+    public class BuscaParticipacoes extends AsyncTask<String, String, String> {
         String mensagem = "Inicial";
         Boolean isSuccess = false;
 
@@ -76,9 +70,9 @@ public class Eventos extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String r) {
-            Toast.makeText(Eventos.this, r, Toast.LENGTH_SHORT).show();
+            Toast.makeText(Participacoes.this, r, Toast.LENGTH_SHORT).show();
             /*if(!isSuccess) {
-                Toast.makeText(Eventos.this, r, Toast.LENGTH_SHORT).show();
+                Toast.makeText(Participacoes.this, r, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), Home.class);
                 startActivity(intent);
             }*/
@@ -87,33 +81,39 @@ public class Eventos extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... parametros) {
-            idGrupo = Integer.parseInt(parametros[0]);
-            if (idGrupo == 0)
-                mensagem = "Erro ao procurar eventos para este grupo!";
+            idEvento = Integer.parseInt(parametros[0]);
+            if (idEvento == 0)
+                mensagem = "Erro ao procurar participacoes para este eventp!";
             else {
                 try {
                     conexao = connectionclass();        // Connect to database
                     if (conexao == null) {
                         mensagem = "Erro de conexão com o Banco de Dados!";
                     } else {
-                        String query = "select * from Eventos where ID in (select IDGRUPO from Eventos where IDGRUPO =" + idGrupo + ")";
+                        String query = "SELECT NOME FROM FUNCOES WHERE ID IN" +
+                                "(SELECT IDFUNCAO FROM PARTICIPACOES WHERE IDEVENTO = "+ idEvento + ")";
                         Statement stmt = conexao.createStatement();
                         ResultSet rs = stmt.executeQuery(query);
-                        while (rs.next()) {
-                            /*Evento evento = new Evento();
-                            evento.setId(rs.getInt("ID"));
-                            evento.setNome(rs.getString("NOME"));*/
-                            nomes.add(rs.getString("NOME"));
-                            ids.add(rs.getInt("ID"));
-                            mensagem += rs.getString("NOME");
+                        while(rs.next())
+                            funcoes.add(rs.getString("NOME"));
+                        query = "SELECT NOME FROM USUARIOS WHERE ID IN" +
+                                "(SELECT IDUSUARIO FROM PARTICIPACOES WHERE IDEVENTO = "+ idEvento + ")";
+                        stmt = conexao.createStatement();
+                        rs = stmt.executeQuery(query);
+                        while (rs.next())
+                            usuarios.add(rs.getString("NOME"));
+                        isSuccess = true;
+                        conexao.close();
+                        for(int i = 0; i < funcoes.size(); i++) {
+                            participacao = (String) usuarios.get(i);
+                            participacao += " - " + funcoes.get(i);
+                            participacoes.add(participacao);
                         }
-                        /*isSuccess = true;
-                        conexao.close();*/
                     }
                 }
                 catch (Exception e) {
                     isSuccess = false;
-                    mensagem = "Erro ao recuperar eventos!";
+                    mensagem = "Erro ao recuperar participacoes!";
                     e.printStackTrace();
                 }
             }
