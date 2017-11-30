@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 public class Participacoes extends AppCompatActivity {
     ListView lista;
-    int idEvento;
+    int idEvento, idUsuario;
     SharedPreferences configuracoes;
     SharedPreferences.Editor editor;
     Connection conexao;
@@ -36,6 +36,7 @@ public class Participacoes extends AppCompatActivity {
     ListAdapter adaptador;
     Intent intent;
     String participacao;
+    Boolean isParticipante;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +51,14 @@ public class Participacoes extends AppCompatActivity {
         lista.setBackgroundColor(Color.DKGRAY);
         configuracoes = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         editor = configuracoes.edit();
+        isParticipante = false;
 
         buscarParticipacoes();
     }
 
     protected void buscarParticipacoes(){
         idEvento = configuracoes.getInt("idEvento", 0);
+        idUsuario = configuracoes.getInt("idUsuario", 0);
         BuscaParticipacoes buscaparticipacoes = new BuscaParticipacoes();
         buscaparticipacoes.execute(Integer.toString(idEvento));
     }
@@ -100,8 +103,17 @@ public class Participacoes extends AppCompatActivity {
                                 "(SELECT IDUSUARIO FROM PARTICIPACOES WHERE IDEVENTO = "+ idEvento + ")";
                         stmt = conexao.createStatement();
                         rs = stmt.executeQuery(query);
-                        while (rs.next())
+                        while(rs.next())
                             usuarios.add(rs.getString("NOME"));
+                        query = "SELECT IDUSUARIO FROM PARTICIPACOES WHERE IDUSUARIO = " + idUsuario;
+                        stmt = conexao.createStatement();
+                        rs = stmt.executeQuery(query);
+                        if(rs.next()) {
+                            isParticipante = true;
+                            mensagem = "É PARTICIPANTE";
+                        }
+                        else
+                            mensagem = "NÃO É PARTICIPANTE";
                         isSuccess = true;
                         conexao.close();
                         for(int i = 0; i < funcoes.size(); i++) {
