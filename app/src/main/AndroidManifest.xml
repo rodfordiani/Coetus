@@ -22,7 +22,8 @@
         <activity android:name=".Home" />
         <activity android:name=".CriarGrupo" />
         <activity android:name=".Grupos" />
-        <activity android:name=".ParticiparGrupo"></activity>
+        <activity android:name=".ParticiparGrupo" />
+        <activity android:name=".Eventos"></activity>
     </application>
 
 </manifest>

@@ -7,7 +7,7 @@
     tools:context="coetus.projetointegradod.puccampinas.coetus.Grupos">
 
     <ListView
-        android:id="@+id/listaGrupos"
+        android:id="@+id/listaEventos"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>

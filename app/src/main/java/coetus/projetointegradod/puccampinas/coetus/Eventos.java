@@ -24,22 +24,21 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class Grupos extends AppCompatActivity {
+public class Eventos extends AppCompatActivity {
     ListView lista;
-    int id;
+    int idGrupo;
     SharedPreferences configuracoes;
     SharedPreferences.Editor editor;
     Connection conexao;
-    ArrayList nomes;
-    ArrayList ids;
+    ArrayList nomes, ids;
     ListAdapter adaptador;
     Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_grupos);
-        lista = findViewById(R.id.listaGrupos);
+        setContentView(R.layout.activity_eventos);
+        lista = findViewById(R.id.listaEventos);
         nomes = new ArrayList();
         ids = new ArrayList();
         adaptador = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, nomes);
@@ -51,24 +50,22 @@ public class Grupos extends AppCompatActivity {
         lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                editor.putInt("idGrupo", (int)ids.get(position));
-                editor.apply();
-                intent = new Intent(getApplicationContext(), Eventos.class);
-                String textoPosicao = Integer.toString(configuracoes.getInt("idGrupo", 0));
-                Toast.makeText(Grupos.this, textoPosicao, Toast.LENGTH_SHORT).show();
-                startActivity(intent);
+
+                /*intent = new Intent(getApplicationContext(), Participantes.class);*/
+                String textoPosicao = String.valueOf(parent.getItemAtPosition(position));
+                Toast.makeText(Eventos.this, textoPosicao, Toast.LENGTH_SHORT).show();
             }
         });
-        buscarGrupos();
+        buscarEventos();
     }
 
-    protected void buscarGrupos(){
-        id = configuracoes.getInt("id", 0);
-        BuscaGrupos buscagrupos = new BuscaGrupos();
-        buscagrupos.execute(Integer.toString(id));
+    protected void buscarEventos(){
+        idGrupo = configuracoes.getInt("idGrupo", 0);
+        BuscaEventos buscaeventos = new BuscaEventos();
+        buscaeventos.execute(Integer.toString(idGrupo));
     }
 
-    public class BuscaGrupos extends AsyncTask<String, String, String> {
+    public class BuscaEventos extends AsyncTask<String, String, String> {
         String mensagem = "Inicial";
         Boolean isSuccess = false;
 
@@ -78,9 +75,9 @@ public class Grupos extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String r) {
-            Toast.makeText(Grupos.this, r, Toast.LENGTH_SHORT).show();
+            Toast.makeText(Eventos.this, r, Toast.LENGTH_SHORT).show();
             /*if(!isSuccess) {
-                Toast.makeText(Grupos.this, r, Toast.LENGTH_SHORT).show();
+                Toast.makeText(Eventos.this, r, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), Home.class);
                 startActivity(intent);
             }*/
@@ -89,22 +86,22 @@ public class Grupos extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... parametros) {
-            id = Integer.parseInt(parametros[0]);
-            if (id == 0)
-                mensagem = "Erro ao procurar grupos para esta conta!";
+            idGrupo = Integer.parseInt(parametros[0]);
+            if (idGrupo == 0)
+                mensagem = "Erro ao procurar eventos para este grupo!";
             else {
                 try {
                     conexao = connectionclass();        // Connect to database
                     if (conexao == null) {
                         mensagem = "Erro de conexão com o Banco de Dados!";
                     } else {
-                        String query = "select * from Grupos where ID in (select IDGRUPO from Integrantes where IDUSUARIO =" + id + ")";
+                        String query = "select * from Eventos where ID in (select IDGRUPO from Eventos where IDGRUPO =" + idGrupo + ")";
                         Statement stmt = conexao.createStatement();
                         ResultSet rs = stmt.executeQuery(query);
                         while (rs.next()) {
-                            /*Grupo grupo = new Grupo();
-                            grupo.setId(rs.getInt("ID"));
-                            grupo.setNome(rs.getString("NOME"));*/
+                            /*Evento evento = new Evento();
+                            evento.setId(rs.getInt("ID"));
+                            evento.setNome(rs.getString("NOME"));*/
                             nomes.add(rs.getString("NOME"));
                             ids.add(rs.getInt("ID"));
                             mensagem += rs.getString("NOME");
@@ -115,7 +112,7 @@ public class Grupos extends AppCompatActivity {
                 }
                 catch (Exception e) {
                     isSuccess = false;
-                    mensagem = "Erro ao recuperar grupos!";
+                    mensagem = "Erro ao recuperar eventos!";
                     e.printStackTrace();
                 }
             }
@@ -128,7 +125,6 @@ public class Grupos extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         Connection connection = null;
-        String ConnectionURL = null;
         try {
             Class.forName("net.sourceforge.jtds.jdbc.Driver");
             String stringConexao = "jdbc:jtds:sqlserver://bdprojetointegradod.database.windows.net:1433;databasename=BDProjetoIntegradoD";
