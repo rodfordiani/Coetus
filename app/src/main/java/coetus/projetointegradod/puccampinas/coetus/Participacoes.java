@@ -11,8 +11,8 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -37,6 +37,7 @@ public class Participacoes extends AppCompatActivity {
     Intent intent;
     String participacao;
     Boolean isParticipante;
+    Button participar, cancelar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +53,27 @@ public class Participacoes extends AppCompatActivity {
         configuracoes = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         editor = configuracoes.edit();
         isParticipante = false;
-
+        participar = findViewById(R.id.participarEvento);
+        cancelar = findViewById(R.id.cancelar);
         buscarParticipacoes();
+        if(!isParticipante)
+            cancelar.setVisibility(View.INVISIBLE);
+
+        participar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                participarEvento();
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!isParticipante)
+            cancelar.setVisibility(View.INVISIBLE);
+        else
+            cancelar.setVisibility(View.VISIBLE);
     }
 
     protected void buscarParticipacoes(){
@@ -61,6 +81,11 @@ public class Participacoes extends AppCompatActivity {
         idUsuario = configuracoes.getInt("idUsuario", 0);
         BuscaParticipacoes buscaparticipacoes = new BuscaParticipacoes();
         buscaparticipacoes.execute(Integer.toString(idEvento));
+    }
+
+    protected void participarEvento(){
+        intent = new Intent(getApplicationContext(), Funcoes.class);
+        startActivity(intent);
     }
 
     public class BuscaParticipacoes extends AsyncTask<String, String, String> {
@@ -86,7 +111,7 @@ public class Participacoes extends AppCompatActivity {
         protected String doInBackground(String... parametros) {
             idEvento = Integer.parseInt(parametros[0]);
             if (idEvento == 0)
-                mensagem = "Erro ao procurar participacoes para este eventp!";
+                mensagem = "Erro ao procurar participacoes para este evento!";
             else {
                 try {
                     conexao = connectionclass();        // Connect to database
@@ -105,7 +130,7 @@ public class Participacoes extends AppCompatActivity {
                         rs = stmt.executeQuery(query);
                         while(rs.next())
                             usuarios.add(rs.getString("NOME"));
-                        query = "SELECT IDUSUARIO FROM PARTICIPACOES WHERE IDUSUARIO = " + idUsuario;
+                        query = "SELECT IDUSUARIO FROM PARTICIPACOES WHERE IDUSUARIO = " + idUsuario + "AND IDEVENTO = " + idEvento;
                         stmt = conexao.createStatement();
                         rs = stmt.executeQuery(query);
                         if(rs.next()) {
